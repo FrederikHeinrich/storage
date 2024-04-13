@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group = 'de.frederikheinrich'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "https://jitpack.io"
+    }
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.6'
+    implementation 'org.mongodb:mongodb-driver-sync:5.0.1'
+    implementation 'com.github.FrederikHeinrich:watchable:528575d53e'
+
+}
+
+test {
+    useJUnitPlatform()
+}
