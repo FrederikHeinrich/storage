@@ -215,10 +215,12 @@ public class StorageTest {
 
         public Watchable<String> text = Watchable.watch("unset");
         public String text2;
+        public String test3;
 
         public TestElement(String text) {
             this.text = Watchable.watch(text);
             this.text2 = text;
+            this.test3 = text + text;
         }
 
         public String getText() {
@@ -241,15 +243,6 @@ public class StorageTest {
         }
 
         @Override
-        public String toString() {
-            return "TestElement{" +
-                    "id=" + id +
-                    ", text=" + text +
-                    ", text2='" + text2 + '\'' +
-                    '}';
-        }
-
-        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -260,6 +253,16 @@ public class StorageTest {
         @Override
         public int hashCode() {
             return Objects.hashCode(id);
+        }
+
+        @Override
+        public String toString() {
+            return "TestElement{" +
+                    "id=" + id +
+                    ", text=" + text +
+                    ", text2='" + text2 + '\'' +
+                    ", test3='" + test3 + '\'' +
+                    '}';
         }
     }
 }

@@ -2,8 +2,8 @@ package de.frederikheinrich.storage;
 
 import com.mongodb.client.model.changestream.FullDocument;
 import com.mongodb.client.model.changestream.OperationType;
-import org.bson.types.ObjectId;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,6 @@ public class SyncedCollection<T> extends Collection<T> {
         try {
             collection.watch().fullDocument(FullDocument.UPDATE_LOOKUP).forEach(change -> {
                 T full = change.getFullDocument();
-                ObjectId id = change.getDocumentKey().get("_id").asObjectId().getValue();
                 OperationType operation = change.getOperationType();
                 // System.out.println("ID: " + id);
                 // System.out.println("Full: " + full);
@@ -38,7 +37,15 @@ public class SyncedCollection<T> extends Collection<T> {
                                     t.getClass().getMethod("set" + s.substring(0, 1).toUpperCase() + s.substring(1), newValue.getClass()).invoke(t, newValue);
                                 } catch (NoSuchMethodException | InvocationTargetException |
                                          IllegalAccessException e) {
-                                    throw new RuntimeException(e);
+                                    // Set the Field without a setter
+                                    try {
+                                        Field field = element.getField(s);
+                                        field.setAccessible(true);
+                                        field.set(t, field.get(full));
+                                    } catch (NoSuchFieldException | IllegalAccessException ex) {
+                                        throw new RuntimeException(ex);
+                                    }
+                                    System.out.println("Full: " + full);
                                 }
                             });
                         }, () -> {
