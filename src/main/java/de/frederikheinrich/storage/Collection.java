@@ -1,10 +1,12 @@
 package de.frederikheinrich.storage;
 
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.InsertOneOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
+import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,15 +32,11 @@ public class Collection<T> {
     }
 
     public CompletableFuture<InsertOneResult> add(T element) {
-        return CompletableFuture.supplyAsync(() -> {
-            return collection.insertOne(element, new InsertOneOptions());
-        });
+        return CompletableFuture.supplyAsync(() -> collection.insertOne(element, new InsertOneOptions()));
     }
 
     public CompletableFuture<DeleteResult> remove(T element) {
-        return CompletableFuture.supplyAsync(() -> {
-            return collection.deleteOne(Filters.eq(element));
-        });
+        return CompletableFuture.supplyAsync(() -> collection.deleteOne(Filters.eq(element)));
     }
 
     public CompletableFuture<Void> clear() {
@@ -46,6 +44,10 @@ public class Collection<T> {
             collection.drop();
             return null;
         });
+    }
+
+    public CompletableFuture<FindIterable<T>> find(Bson filters) {
+        return CompletableFuture.supplyAsync(() -> collection.find(filters));
     }
 
     protected void close() {
