@@ -3,6 +3,7 @@ package de.frederikheinrich.storage;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.InsertOneOptions;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 
 import java.util.ArrayList;
@@ -18,13 +19,11 @@ public class Collection<T> {
         database.collections.add(this);
         this.element = element;
         this.collection = database.database.getCollection(element.getSimpleName(), element);
-        System.out.println("Collection created: " + collection.getNamespace());
-
     }
 
     public CompletableFuture<List<T>> list() {
         return CompletableFuture.supplyAsync(() -> {
-            var list = new ArrayList<T>();
+            ArrayList<T> list = new ArrayList<T>();
             collection.find().forEach(list::add);
             return list;
         });
@@ -32,15 +31,13 @@ public class Collection<T> {
 
     public CompletableFuture<InsertOneResult> add(T element) {
         return CompletableFuture.supplyAsync(() -> {
-            var insert = collection.insertOne(element, new InsertOneOptions());
-            System.out.println("Added " + element + " - " + insert);
-            return insert;
+            return collection.insertOne(element, new InsertOneOptions());
         });
     }
 
-    public CompletableFuture<Boolean> remove(T element) {
+    public CompletableFuture<DeleteResult> remove(T element) {
         return CompletableFuture.supplyAsync(() -> {
-            return collection.deleteOne(Filters.eq(element)).wasAcknowledged();
+            return collection.deleteOne(Filters.eq(element));
         });
     }
 
