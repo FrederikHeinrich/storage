@@ -19,8 +19,8 @@ public class SyncedCollection<T> extends Collection<T> {
                 T full = change.getFullDocument();
                 ObjectId id = change.getDocumentKey().get("_id").asObjectId().getValue();
                 OperationType operation = change.getOperationType();
-                System.out.println("ID: " + id);
-                System.out.println("Full: " + full);
+                // System.out.println("ID: " + id);
+                // System.out.println("Full: " + full);
                 switch (operation) {
                     case INSERT:
                         local.add(full);
