@@ -30,6 +30,10 @@ public class Storage {
      * is properly set.
      */
     public Storage(String uri) {
+        this(new ConnectionString(uri));
+    }
+
+    public Storage(ConnectionString uri) {
         CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
         CodecRegistry pojoCodecRegistry = MongoClientSettings.getDefaultCodecRegistry();
         CodecRegistry customCodecRegistry = CodecRegistries.fromProviders(pojoCodecProvider);
@@ -37,9 +41,13 @@ public class Storage {
 
         MongoClientSettings settings = MongoClientSettings.builder()
                 .uuidRepresentation(UuidRepresentation.JAVA_LEGACY)
-                .applyConnectionString(new ConnectionString(uri))
+                .applyConnectionString(uri)
                 .codecRegistry(codecRegistry)
                 .build();
+        this.client = MongoClients.create(settings);
+    }
+
+    public Storage(MongoClientSettings settings) {
         this.client = MongoClients.create(settings);
     }
 
