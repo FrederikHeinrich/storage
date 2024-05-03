@@ -21,6 +21,7 @@ public class Collection<T> {
     protected Class<T> element;
     protected MongoCollection<T> collection;
 
+
     protected Collection(Database database, Class<T> element) {
         this.database = database;
         this.element = element;
@@ -46,6 +47,10 @@ public class Collection<T> {
 
     public CompletableFuture<DeleteResult> remove(T element) {
         return CompletableFuture.supplyAsync(() -> collection.deleteOne(Filters.eq(element)));
+    }
+
+    public CompletableFuture<DeleteResult> remove(Bson filter) {
+        return CompletableFuture.supplyAsync(() -> collection.deleteMany(filter));
     }
 
     public CompletableFuture<Void> clear() {

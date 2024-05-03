@@ -19,7 +19,10 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.6'
-    implementation 'org.mongodb:mongodb-driver-sync:5.0.1'
+
+    // https://github.com/mongodb/mongo-java-driver
+    implementation 'org.mongodb:mongodb-driver-sync:5.1.0'
+
     implementation 'com.github.FrederikHeinrich:watchable:528575d53e'
 
 }
