@@ -84,7 +84,7 @@ public class SyncedCollection<T> extends Collection<T> {
 
     protected SyncedCollection(Database database, Class<T> element) {
         super(database, element);
-        database.syncedCollections.put(element.getSimpleName(), this);
+        database.syncedCollections.put(element.getSimpleName().toLowerCase(), this);
         collection.find().forEach(local::add);
         thread.start();
     }

@@ -25,8 +25,8 @@ public class Collection<T> {
     protected Collection(Database database, Class<T> element) {
         this.database = database;
         this.element = element;
-        this.collection = database.database.getCollection(element.getSimpleName(), element);
-        database.collections.put(element.getSimpleName(), this);
+        this.collection = database.database.getCollection(element.getSimpleName().toLowerCase(), element);
+        database.collections.put(element.getSimpleName().toLowerCase(), this);
     }
 
     public MongoCollection<T> mongo() {
