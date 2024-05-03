@@ -36,9 +36,9 @@ public class Storage {
         CodecRegistry codecRegistry = CodecRegistries.fromRegistries(pojoCodecRegistry, customCodecRegistry);
 
         MongoClientSettings settings = MongoClientSettings.builder()
+                .uuidRepresentation(UuidRepresentation.JAVA_LEGACY)
                 .applyConnectionString(new ConnectionString(uri))
                 .codecRegistry(codecRegistry)
-                .uuidRepresentation(UuidRepresentation.STANDARD)
                 .build();
         this.client = MongoClients.create(settings);
     }

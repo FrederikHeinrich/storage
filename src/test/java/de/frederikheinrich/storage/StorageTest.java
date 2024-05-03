@@ -18,10 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -163,12 +160,19 @@ public class StorageTest {
         Database database = storage.getDatabase("testDB");
         assertNotNull(database, "Database fetching failed");
         SyncedCollection<TestElement> collection = database.syncedCollection(TestElement.class);
+        SyncedCollection<TestUUIDElement> uuidCollection = database.syncedCollection(TestUUIDElement.class);
         collection.list().join().forEach(testElement -> {
             System.out.println("Adding watcher on " + testElement.id);
             testElement.text.on((s, t1) -> {
                 System.out.println("CHANGED : " + testElement.id + " -> " + s + " to " + t1);
             });
         });
+        uuidCollection.list().join().forEach(testUUIDElement -> {
+            System.out.println(testUUIDElement);
+        });
+
+        TestUUIDElement uuidElement = new TestUUIDElement("test");
+        uuidCollection.add(uuidElement);
 
         assertNotNull(collection, "Collection fetching failed");
 
@@ -198,6 +202,32 @@ public class StorageTest {
             Thread.sleep(100000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static class TestUUIDElement {
+
+        @BsonId
+        public UUID uuid;
+
+        public String text;
+
+        public TestUUIDElement(String text) {
+            this.uuid = UUID.randomUUID();
+            this.text = text;
+        }
+
+        public TestUUIDElement(UUID uuid, String text) {
+            this.uuid = uuid;
+            this.text = text;
+        }
+
+        public TestUUIDElement() {
+            
+        }
+
+        public UUID getUuid() {
+            return uuid;
         }
     }
 
