@@ -111,13 +111,6 @@ public class StorageTest {
             Thread.sleep(1000);
         } catch (InterruptedException ignored) {
         }
-        storage.databases.forEach(database -> {
-            database.collections.forEach(syncedCollection -> {
-                syncedCollection.list().thenAccept(objects -> {
-                    System.out.println(syncedCollection.element.getSimpleName() + " - " + objects);
-                });
-            });
-        });
     }
 
 

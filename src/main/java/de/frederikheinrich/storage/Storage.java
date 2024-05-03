@@ -9,14 +9,25 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
-import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Storage {
 
 
     protected MongoClient client;
-    protected ArrayList<Database> databases = new ArrayList<>();
+    protected ConcurrentHashMap<String, Database> databases = new ConcurrentHashMap<>();
 
+
+    /**
+     * The Storage class is responsible for managing the connection to a MongoDB database
+     * and providing access to the various collections within the database.
+     * It provides methods to retrieve a specific database, close the connection,
+     * and perform operations on collections.
+     * <p>
+     * This Storage() constructor makes use of the system environment variable "MONGO_URI" to
+     * establish the connection to a MongoDB server. Ensure that the "MONGO_URI" environment variable
+     * is properly set.
+     */
     public Storage(String uri) {
         CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
         CodecRegistry pojoCodecRegistry = MongoClientSettings.getDefaultCodecRegistry();
@@ -33,13 +44,17 @@ public class Storage {
     }
 
     public Database getDatabase(String database) {
+        if (!databases.containsKey(database))
+            return databases.get(database);
         return new Database(this, database);
     }
 
     public void close() {
-        databases.forEach(Database::close);
+        databases.forEach((s, database) -> {
+            database.close();
+            databases.remove(s);
+        });
         client.close();
     }
-
 
 }

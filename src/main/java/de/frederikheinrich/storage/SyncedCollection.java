@@ -11,15 +11,13 @@ import java.util.concurrent.CompletableFuture;
 
 public class SyncedCollection<T> extends Collection<T> {
 
-    private final ArrayList<T> local = new ArrayList<>();
+    protected final ArrayList<T> local = new ArrayList<>();
 
-    private final Thread thread = new Thread(() -> {
+    protected final Thread thread = new Thread(() -> {
         try {
             collection.watch().fullDocument(FullDocument.UPDATE_LOOKUP).forEach(change -> {
                 T full = change.getFullDocument();
                 OperationType operation = change.getOperationType();
-                // System.out.println("ID: " + id);
-                // System.out.println("Full: " + full);
                 switch (operation) {
                     case INSERT:
                         local.add(full);
@@ -37,7 +35,6 @@ public class SyncedCollection<T> extends Collection<T> {
                                     t.getClass().getMethod("set" + s.substring(0, 1).toUpperCase() + s.substring(1), newValue.getClass()).invoke(t, newValue);
                                 } catch (NoSuchMethodException | InvocationTargetException |
                                          IllegalAccessException e) {
-                                    // Set the Field without a setter
                                     try {
                                         Field field = element.getField(s);
                                         field.setAccessible(true);
@@ -45,11 +42,10 @@ public class SyncedCollection<T> extends Collection<T> {
                                     } catch (NoSuchFieldException | IllegalAccessException ex) {
                                         throw new RuntimeException(ex);
                                     }
-                                    System.out.println("Full: " + full);
                                 }
                             });
                         }, () -> {
-                            System.out.println("ERROR UPDATE");
+                            throw new RuntimeException("Updated missing local Element?\n" + change);
                         });
                         break;
                     case DROP:
@@ -78,9 +74,10 @@ public class SyncedCollection<T> extends Collection<T> {
         }
     });
 
-    public SyncedCollection(Database database, Class<T> element) {
+    protected SyncedCollection(Database database, Class<T> element) {
         super(database, element);
-        collection.find().forEach(t -> local.add(t));
+        database.syncedCollections.put(element.getSimpleName(), this);
+        collection.find().forEach(local::add);
         thread.start();
     }
 

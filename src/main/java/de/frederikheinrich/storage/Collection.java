@@ -12,17 +12,24 @@ import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class Collection<T> {
 
+    protected Database database;
     protected Class<T> element;
     protected MongoCollection<T> collection;
 
-    public Collection(Database database, Class<T> element) {
-        database.collections.add(this);
+    protected Collection(Database database, Class<T> element) {
+        this.database = database;
         this.element = element;
         this.collection = database.database.getCollection(element.getSimpleName(), element);
+        database.collections.put(element.getSimpleName(), this);
+    }
+
+    public MongoCollection<T> mongo() {
+        return collection;
     }
 
     public CompletableFuture<List<T>> list() {
@@ -64,6 +71,26 @@ public class Collection<T> {
         });
     }
 
+    public CompletableFuture<UpdateResult> update(Bson filters, Bson update, UpdateOptions options) {
+        return CompletableFuture.supplyAsync(() -> {
+            return collection.updateOne(Filters.eq(filters), update, options);
+        });
+    }
+
+    public CompletableFuture<UpdateResult> updateMany(Bson filters, Bson update, UpdateOptions options) {
+        return CompletableFuture.supplyAsync(() -> {
+            return collection.updateMany(Filters.eq(filters), update, options);
+        });
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Collection<?> that = (Collection<?>) o;
+        return Objects.equals(collection.getNamespace(), that.collection.getNamespace());
+    }
+
     protected void close() {
 
     }
@@ -75,4 +102,5 @@ public class Collection<T> {
                 ", collection=" + collection +
                 '}';
     }
+
 }
