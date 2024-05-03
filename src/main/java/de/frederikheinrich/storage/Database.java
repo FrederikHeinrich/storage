@@ -21,12 +21,14 @@ public class Database {
         return database;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> Collection<T> collection(Class<T> element) {
         if (collections.containsKey(element.getSimpleName().toLowerCase()))
-            return (Collection<T>) collections.get(element.getSimpleName());
+            return (Collection<T>) collections.get(element.getSimpleName().toLowerCase());
         return new Collection<T>(this, element);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> SyncedCollection<T> syncedCollection(Class<T> element) {
         if (syncedCollections.containsKey(element.getSimpleName().toLowerCase())) {
             return (SyncedCollection<T>) syncedCollections.get(element.getSimpleName().toLowerCase());
