@@ -50,7 +50,7 @@ public class Storage {
     }
 
     public Database getDatabase(String database) {
-        if (!databases.containsKey(database))
+        if (databases.containsKey(database))
             return databases.get(database);
         return new Database(this, database);
     }
