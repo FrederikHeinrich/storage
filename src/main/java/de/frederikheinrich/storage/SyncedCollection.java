@@ -8,10 +8,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class SyncedCollection<T> extends Collection<T> {
 
     protected final ArrayList<T> local = new ArrayList<>();
+
+    protected final ArrayList<Consumer<T>> onInserts = new ArrayList<>();
 
     protected final Thread thread = new Thread(() -> {
         try {
@@ -21,6 +24,7 @@ public class SyncedCollection<T> extends Collection<T> {
                 switch (operation) {
                     case INSERT:
                         local.add(full);
+                        onInserts.forEach(consumer -> consumer.accept(full));
                         break;
                     case DELETE:
                         local.removeIf(t -> t.equals(full));
@@ -73,6 +77,10 @@ public class SyncedCollection<T> extends Collection<T> {
         } catch (IllegalStateException ignored) {
         }
     });
+
+    public void onInsert(Consumer<T> onInsert) {
+        onInserts.add(onInsert);
+    }
 
     protected SyncedCollection(Database database, Class<T> element) {
         super(database, element);

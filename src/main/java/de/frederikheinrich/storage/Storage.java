@@ -38,9 +38,15 @@ public class Storage {
                 .applyConnectionString(new ConnectionString(uri))
                 .codecRegistry(codecRegistry)
                 .build();
-
         this.client = MongoClients.create(settings);
+    }
 
+    public MongoClient mongo() {
+        return client;
+    }
+
+    public boolean isReady() {
+        return client != null;
     }
 
     public Database getDatabase(String database) {
