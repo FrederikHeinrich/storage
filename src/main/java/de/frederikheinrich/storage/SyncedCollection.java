@@ -78,14 +78,22 @@ public class SyncedCollection<T> extends Collection<T> {
         }
     });
 
+
     public void onInsert(Consumer<T> onInsert) {
         onInserts.add(onInsert);
+    }
+
+    public void sync(T obj) {
+        local.add(obj);
+    }
+
+    public void unsync(T obj) {
+        local.remove(obj);
     }
 
     protected SyncedCollection(Database database, Class<T> element) {
         super(database, element);
         database.syncedCollections.put(element.getSimpleName().toLowerCase(), this);
-        collection.find().forEach(local::add);
         thread.start();
     }
 
